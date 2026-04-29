@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Open Access Media</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0a; --surface: #111; --border: #222;
+      --text: #e8e8e8; --muted: #888; --accent: #ff3c00; --accent2: #ffcc00;
+      --code-bg: #161616;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-weight: 300; line-height: 1.7; }
+
+    /* NAV */
+    nav { position: sticky; top: 0; z-index: 100; background: var(--bg); border-bottom: 1px solid var(--border); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+    .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.08em; color: var(--accent); cursor: pointer; }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links button { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); background: none; border: none; cursor: pointer; transition: color 0.2s; padding: 0; }
+    .nav-links button:hover, .nav-links button.active { color: var(--text); }
+
+    /* HERO */
+    .hero { padding: 6rem 2rem 4rem; max-width: 900px; margin: 0 auto; border-bottom: 1px solid var(--border); }
+    .hero-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.5rem; }
+    .hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3.5rem, 10vw, 7rem); line-height: 0.95; letter-spacing: 0.02em; margin-bottom: 2rem; }
+    .hero h1 em { font-style: normal; color: var(--accent); }
+    .hero-sub { font-size: 1.05rem; color: var(--muted); max-width: 560px; line-height: 1.8; }
+    .hero-btns { margin-top: 1.8rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    /* BUTTONS */
+    .btn { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.7rem 1.5rem; border: 1px solid var(--accent); color: var(--accent); background: none; cursor: pointer; transition: background 0.2s, color 0.2s; }
+    .btn:hover { background: var(--accent); color: var(--bg); }
+    .btn-filled { background: var(--accent); color: var(--bg); }
+    .btn-filled:hover { background: transparent; color: var(--accent); }
+
+    /* CONTENT */
+    .content { max-width: 900px; margin: 0 auto; padding: 4rem 2rem; }
+    .content-section { margin-bottom: 4rem; padding-bottom: 4rem; border-bottom: 1px solid var(--border); }
+    .content-section:last-child { border-bottom: none; }
+    .section-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; }
+    .content h2 { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 0.04em; margin-bottom: 1.5rem; line-height: 1; }
+    .content p { font-size: 1rem; line-height: 1.8; color: #ccc; margin-bottom: 1.2rem; max-width: 680px; }
+
+    /* PULLQUOTE */
+    .pullquote { border-left: 3px solid var(--accent); padding: 1.5rem 2rem; margin: 2.5rem 0; background: var(--surface); }
+    .pullquote p { font-style: italic; font-size: 1.1rem; line-height: 1.7; color: var(--text); margin: 0 0 0.75rem; max-width: none; }
+    .pullquote cite { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); font-style: normal; }
+
+    /* GUIDE */
+    .guide-step { margin-bottom: 3.5rem; padding-bottom: 3.5rem; border-bottom: 1px solid var(--border); }
+    .guide-step:last-child { border-bottom: none; }
+    .step-number { font-family: 'Bebas Neue', sans-serif; font-size: 5rem; line-height: 1; color: var(--border); margin-bottom: -0.5rem; }
+    .step-title { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.04em; margin-bottom: 1.5rem; }
+    .step-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .step-list li { padding-left: 1.2rem; position: relative; color: #ccc; font-size: 0.95rem; line-height: 1.7; }
+    .step-list li::before { content: '→'; position: absolute; left: 0; color: var(--accent); font-size: 0.8rem; }
+    .step-list.sub { margin-top: 0.4rem; margin-left: 1.5rem; }
+    .step-list.sub li::before { content: '·'; color: var(--muted); }
+    .sub-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent2); margin: 1.4rem 0 0.5rem; }
+
+    /* CODE */
+    code { font-family: 'IBM Plex Mono', monospace; font-size: 0.85em; background: var(--code-bg); border: 1px solid var(--border); padding: 0.1em 0.4em; border-radius: 2px; color: var(--accent2); }
+    .code-block { background: var(--code-bg); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 1.2rem 1.5rem; margin: 1rem 0; overflow-x: auto; }
+    .code-block code { background: none; border: none; padding: 0; font-size: 0.85rem; line-height: 1.8; color: var(--accent2); display: block; white-space: pre; }
+
+    /* LINKS */
+    a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+    a:hover { border-bottom-color: var(--accent); }
+
+    /* NOTE */
+    .note { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--muted); border: 1px solid var(--border); padding: 0.8rem 1rem; margin-top: 2rem; line-height: 1.6; }
+
+    /* RESOURCE GRID */
+    .resource-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 1.5rem; }
+    .resource-card { background: var(--bg); padding: 1.5rem; transition: background 0.2s; }
+    .resource-card:hover { background: var(--surface); }
+    .resource-card h3 { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent2); margin-bottom: 0.4rem; }
+    .resource-card p { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.8rem; line-height: 1.5; max-width: none; }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.08em; }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 3rem; }
+      .nav-links { gap: 1rem; }
+      .content { padding: 2rem 1rem; }
+      .hero { padding: 3rem 1rem 2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    function Nav({ page, setPage }) {
+      return (
+        <nav>
+          <span className="nav-logo" onClick={() => setPage('about')}>OAM</span>
+          <ul className="nav-links">
+            <li><button className={page === 'about' ? 'active' : ''} onClick={() => setPage('about')}>About</button></li>
+            <li><button className={page === 'guide' ? 'active' : ''} onClick={() => setPage('guide')}>Build Guide</button></li>
+            <li><button className={page === 'resources' ? 'active' : ''} onClick={() => setPage('resources')}>Resources</button></li>
+          </ul>
+        </nav>
+      );
+    }
+
+    function About({ setPage }) {
+      return (
+        <>
+          <header className="hero">
+            <p className="hero-label">Open Access Media Project</p>
+            <h1>Information<br />Is <em>Power.</em></h1>
+            <p className="hero-sub">A guide to reclaiming your media, breaking free from streaming fragmentation, and building your own personal media server.</p>
+            <div className="hero-btns">
+              <button className="btn btn-filled" onClick={() => setPage('guide')}>Build Your Server</button>
+              <button className="btn" onClick={() => setPage('resources')}>Browse Resources</button>
+            </div>
+          </header>
+
+          <main className="content">
+            <section className="content-section">
+              <p className="section-label">The Problem</p>
+              <h2>The Streaming Trap</h2>
+              <div className="pullquote">
+                <p>"Information is power. But like all power, there are those who want to keep it for themselves."</p>
+                <cite>— Aaron Swartz, Guerrilla Open Access Manifesto (2008)</cite>
+              </div>
+              <p>Anyone who has spent time on the internet has invariably come across a paywall. The growth of the streaming service model has led to steadily higher subscription prices — a Forbes survey found that 44% of Americans saw a price bump in the past year alone. With average internet costs and multiple subscriptions, some Americans are spending more than $110 per month just to access content.</p>
+              <p>But cost is only part of the problem. The dispersion of TV shows, movies, and live sports across dozens of competing platforms creates confusion and fatigue. Your favorite show might vanish overnight — platforms routinely purge content to cut licensing costs. Physical media is no safer, plagued by rights negotiations and dwindling availability.</p>
+              <p>Streaming services are only one piece of the puzzle. Corporate interests have seized upon our hunger for content, commodifying everything from academic articles to basic software. This hostage situation continues for as long as we open our wallets.</p>
+            </section>
+
+            <section className="content-section">
+              <p className="section-label">Our Mission</p>
+              <h2>The Open Access Alternative</h2>
+              <div className="pullquote">
+                <p>"You get to feed at this banquet of knowledge while the rest of the world is locked out. But you need not — indeed, morally, you cannot — keep this privilege for yourselves. You have a duty to share it with the world."</p>
+                <cite>— Aaron Swartz, Guerrilla Open Access Manifesto (2008)</cite>
+              </div>
+              <p>Aaron Swartz — architect of Creative Commons and a founding figure of the Open Access Movement — fought to liberate information from corporate control and paid dearly for it. From 2011 until his death in early 2013, Swartz faced state and federal charges for using MIT's network to download thousands of academic articles from JSTOR. His belief was simple: sharing knowledge is a moral imperative.</p>
+              <p>Swartz was not the first to act on this belief. In May 1970, 150 students at NYU "kidnapped" a six-ton mainframe belonging to the Atomic Energy Commission, demanding justice for local activists. Contemporary organizers in Amsterdam, facing extralegal AI surveillance from their own government, shared their story nationally — forcing the state to answer publicly.</p>
+              <p>Information can be given and taken away. Wherever it goes, it should benefit us all. Our project centers on one concrete way to embody that principle: the personal media server. By identifying legal, trustworthy sources of freely available media and providing a clear guide to hosting it yourself, we offer a small but meaningful act of information autonomy.</p>
+            </section>
+
+            <section className="content-section">
+              <p className="section-label">How It Works</p>
+              <h2>What We Built</h2>
+              <p>We built and documented a working personal media server using a Raspberry Pi and <a href="https://jellyfin.org" target="_blank">Jellyfin</a>, a free and open-source media platform. The server hosts public domain films, audiobooks, and other freely licensed content sourced from the Internet Archive, Librivox, Project Gutenberg, and more.</p>
+              <p>Our build guide walks through every step — from flashing the OS to remote access via Tailscale — in plain language accessible to anyone. No prior Linux experience required.</p>
+              <div className="hero-btns">
+                <button className="btn" onClick={() => setPage('guide')}>Read the Build Guide →</button>
+              </div>
+            </section>
+          </main>
+        </>
+      );
+    }
+
+    function Guide() {
+      return (
+        <>
+          <header className="hero">
+            <p className="hero-label">Step-by-Step</p>
+            <h1>Build Your<br /><em>Own Server</em></h1>
+            <p className="hero-sub">A complete guide to setting up a Raspberry Pi media server with Jellyfin. No prior Linux experience required.</p>
+          </header>
+
+          <main className="content">
+            <section className="content-section">
+              <p className="section-label">What You'll Need</p>
+              <h2>Hardware Shopping List</h2>
+              <ul className="step-list">
+                <li><strong>Raspberry Pi 4 or 5</strong> (4GB RAM minimum, 8GB recommended) — ~$55–80</li>
+                <li><strong>MicroSD card</strong> (32GB+, Class 10) — ~$10, for the OS</li>
+                <li><strong>External USB hard drive</strong> — size depends on your media library</li>
+                <li><strong>Official Raspberry Pi power supply</strong> — worth it to avoid instability issues</li>
+                <li><strong>Ethernet cable</strong> — recommended over Wi-Fi for stable streaming</li>
+              </ul>
+              <p style={{marginTop:'1.2rem', fontSize:'0.85rem', color:'var(--muted)'}}>Total cost: ~$100–150, a one-time cost with no subscription fees.</p>
+            </section>
+
+            {[
+              {
+                n: '01', title: 'Hardware & OS Setup',
+                content: (
+                  <ul className="step-list">
+                    <li>Download and install <a href="https://www.raspberrypi.com/software/" target="_blank">Raspberry Pi Imager</a></li>
+                    <li>Flash <a href="https://www.raspberrypi.com/software/operating-systems/" target="_blank">Raspberry Pi OS Lite (64-bit)</a> to your microSD card</li>
+                    <li>Before flashing, click <strong>Edit Settings</strong> and configure:
+                      <ul className="step-list sub" style={{marginTop:'0.5rem'}}>
+                        <li>Set a username and password</li>
+                        <li>Enable SSH</li>
+                        <li>Enter your Wi-Fi name and password</li>
+                      </ul>
+                    </li>
+                    <li>Insert the SD card and power on the Pi</li>
+                  </ul>
+                )
+              },
+              {
+                n: '02', title: 'Remote Access',
+                content: (
+                  <>
+                    <p className="sub-label">Option A — SSH from Terminal</p>
+                    <div className="code-block"><code>ssh yourname@raspberrypi.local</code></div>
+                    <ul className="step-list" style={{marginTop:'0.8rem'}}>
+                      <li><a href="https://www.raspberrypi.com/documentation/computers/remote-access.html#ssh" target="_blank">SSH documentation</a></li>
+                    </ul>
+                    <p className="sub-label">Option B — Raspberry Pi Connect</p>
+                    <div className="code-block"><code>{`sudo apt install rpi-connect\nrpi-connect on`}</code></div>
+                    <ul className="step-list" style={{marginTop:'0.8rem'}}>
+                      <li>Visit <a href="https://connect.raspberrypi.com" target="_blank">connect.raspberrypi.com</a> to link and access your Pi</li>
+                      <li><a href="https://www.raspberrypi.com/documentation/computers/remote-access.html" target="_blank">Full remote access documentation</a></li>
+                    </ul>
+                  </>
+                )
+              },
+              {
+                n: '03', title: 'Install Jellyfin',
+                content: (
+                  <>
+                    <p style={{color:'var(--muted)', fontSize:'0.9rem', marginBottom:'1rem'}}><a href="https://jellyfin.org" target="_blank">Jellyfin</a> is a free, open-source media server. Once connected to your Pi, run:</p>
+                    <div className="code-block"><code>{`sudo apt update && sudo apt upgrade -y\ncurl https://repo.jellyfin.org/install-jellyfin.py | sudo python3`}</code></div>
+                    <ul className="step-list" style={{marginTop:'1rem'}}>
+                      <li>Accept the defaults when prompted</li>
+                      <li>Verify it's running: <code>sudo systemctl status jellyfin</code></li>
+                      <li>You should see <strong>active (running)</strong> in the output</li>
+                      <li><a href="https://jellyfin.org/docs/general/installation/linux" target="_blank">Jellyfin Linux install docs</a></li>
+                    </ul>
+                  </>
+                )
+              },
+              {
+                n: '04', title: 'Access the UI',
+                content: (
+                  <ul className="step-list">
+                    <li>Open a browser on any device on your home network</li>
+                    <li>Navigate to: <code>http://raspberrypi.local:8096</code></li>
+                    <li>Complete the <a href="https://jellyfin.org/docs/general/quick-start/" target="_blank">Jellyfin setup wizard</a> — create an admin account and add your media folders</li>
+                  </ul>
+                )
+              },
+              {
+                n: '05', title: 'Adding Media to Your Server',
+                content: (
+                  <ul className="step-list">
+                    <li>Connect a USB hard drive to the Pi for your media library</li>
+                    <li>Organize files so Jellyfin can identify them:
+                      <ul className="step-list sub" style={{marginTop:'0.5rem'}}>
+                        <li><code>Movies/Movie Name (Year)/moviefile.mp4</code></li>
+                        <li><code>TV Shows/Show Name/Season 01/episode.mp4</code></li>
+                      </ul>
+                    </li>
+                    <li>Transfer files from your Mac/PC to the Pi:
+                      <ul className="step-list sub" style={{marginTop:'0.5rem'}}>
+                        <li>Terminal: <code>scp /path/to/file yourname@raspberrypi.local:/media/</code></li>
+                        <li>Or use <a href="https://cyberduck.io" target="_blank">Cyberduck</a> — a free GUI file transfer app</li>
+                      </ul>
+                    </li>
+                    <li><a href="https://www.raspberrypi.com/documentation/computers/configuration.html#mounting-a-usb-drive" target="_blank">Guide to mounting a USB drive on Raspberry Pi</a></li>
+                  </ul>
+                )
+              },
+              {
+                n: '06', title: 'Watching Your Media',
+                content: (
+                  <ul className="step-list">
+                    <li><strong>Browser</strong> — go to <code>http://raspberrypi.local:8096</code> on any device on your home Wi-Fi</li>
+                    <li><strong>Jellyfin app</strong> (free):
+                      <ul className="step-list sub" style={{marginTop:'0.5rem'}}>
+                        <li>iOS & Android — search "Jellyfin" in the App Store or Google Play</li>
+                        <li>Apple TV, Roku, Fire TV, Samsung TV — search "Jellyfin" in the respective app store</li>
+                        <li><a href="https://jellyfin.org/downloads/clients/" target="_blank">Desktop app for Mac, Windows, Linux</a></li>
+                      </ul>
+                    </li>
+                  </ul>
+                )
+              },
+              {
+                n: '07', title: 'Accessing Your Server Outside Your Home',
+                content: (
+                  <>
+                    <p className="sub-label">Option A — Tailscale (Recommended)</p>
+                    <div className="code-block"><code>{`curl -fsSL https://tailscale.com/install.sh | sh\nsudo tailscale up`}</code></div>
+                    <ul className="step-list" style={{marginTop:'0.8rem'}}>
+                      <li>Install <a href="https://tailscale.com/download" target="_blank">Tailscale</a> on your phone or laptop too</li>
+                      <li>Sign in with the same account on both devices</li>
+                      <li>Access your Pi from anywhere as if you were home</li>
+                    </ul>
+                    <p className="sub-label">Option B — Port Forwarding (Advanced)</p>
+                    <ul className="step-list">
+                      <li>Log into your router settings (usually <code>http://192.168.1.1</code>)</li>
+                      <li>Forward external port 8096 to your Pi's local IP address</li>
+                      <li>Access via your home's public IP address from anywhere</li>
+                    </ul>
+                  </>
+                )
+              },
+              {
+                n: '08', title: 'Where to Get Legal Media',
+                content: (
+                  <>
+                    <ul className="step-list">
+                      <li><a href="https://archive.org" target="_blank">Internet Archive</a> — movies, TV, books, audio, all public domain</li>
+                      <li><a href="https://commons.wikimedia.org" target="_blank">Wikimedia Commons</a> — public domain films and images</li>
+                      <li><a href="https://librivox.org" target="_blank">Librivox</a> — free public domain audiobooks</li>
+                      <li><a href="https://www.gutenberg.org" target="_blank">Project Gutenberg</a> — free ebooks</li>
+                      <li><a href="https://images.nasa.gov" target="_blank">NASA Media Library</a> — free photos and video</li>
+                    </ul>
+                    <div className="note">NOTE: We only recommend using your media server with legally obtained or public domain content.</div>
+                  </>
+                )
+              }
+            ].map(step => (
+              <div className="guide-step" key={step.n}>
+                <div className="step-number">{step.n}</div>
+                <h2 className="step-title">{step.title}</h2>
+                {step.content}
+              </div>
+            ))}
+          </main>
+        </>
+      );
+    }
+
+    function Resources() {
+      const sections = [
+        {
+          label: 'Video & Film', title: 'Movies & Video',
+          cards: [
+            { name: 'Internet Archive — Feature Films', desc: 'Thousands of public domain films including classics, documentaries, and animations. Free to stream or download.', url: 'https://archive.org/details/feature_films' },
+            { name: 'Prelinger Archives', desc: 'Industrial, educational, and ephemeral films from the 20th century. Endlessly weird and wonderful.', url: 'https://archive.org/details/prelinger' },
+            { name: 'NASA Video Library', desc: 'Free photos, videos, and audio from NASA missions. All content is in the public domain.', url: 'https://images.nasa.gov' },
+            { name: 'Wikimedia Commons', desc: 'Freely licensed video files including public domain films and historical footage.', url: 'https://commons.wikimedia.org/wiki/Category:Videos' },
+            { name: 'Night of the Living Dead (1968)', desc: "Romero's original horror classic — public domain and free to download.", url: 'https://archive.org/details/night_of_the_living_dead' },
+            { name: 'Nosferatu (1922)', desc: 'The original vampire film. One of the most iconic works of German Expressionist cinema.', url: 'https://archive.org/details/nosferatu_1922' },
+          ]
+        },
+        {
+          label: 'Audio', title: 'Audiobooks & Music',
+          cards: [
+            { name: 'Librivox', desc: 'Free public domain audiobooks recorded by volunteers. Thousands of titles in dozens of languages.', url: 'https://librivox.org' },
+            { name: 'Internet Archive — Audio', desc: 'Live music recordings, old-time radio, podcasts, and more. An enormous free archive.', url: 'https://archive.org/details/audio' },
+            { name: 'Free Music Archive', desc: 'Openly licensed music across genres. All tracks are legal to download and use.', url: 'https://freemusicarchive.org' },
+          ]
+        },
+        {
+          label: 'Books & Text', title: 'Ebooks & Documents',
+          cards: [
+            { name: 'Project Gutenberg', desc: 'Over 70,000 free ebooks — older works for which copyright has expired in the US.', url: 'https://www.gutenberg.org' },
+            { name: 'Standard Ebooks', desc: 'Beautifully typeset, carefully edited public domain ebooks. Higher quality than most Gutenberg files.', url: 'https://standardebooks.org' },
+            { name: 'Internet Archive — Books', desc: 'Millions of digitized books, including borrowable titles via the Open Library.', url: 'https://archive.org/details/texts' },
+          ]
+        },
+        {
+          label: 'Tools', title: 'Open Source Tools',
+          cards: [
+            { name: 'Jellyfin', desc: 'Free, open-source media server software. The core of your personal streaming setup.', url: 'https://jellyfin.org' },
+            { name: 'Raspberry Pi OS', desc: 'The official OS for Raspberry Pi hardware. Free, Debian-based, built for this use case.', url: 'https://www.raspberrypi.com/software/' },
+            { name: 'Tailscale', desc: 'Free VPN for securely accessing your server from anywhere. Easiest remote access solution.', url: 'https://tailscale.com' },
+            { name: 'Cyberduck', desc: 'Free file transfer app for Mac and Windows. Makes copying media to your Pi easy.', url: 'https://cyberduck.io' },
+          ]
+        },
+        {
+          label: 'Further Reading', title: 'Foundational Texts',
+          cards: [
+            { name: 'Guerrilla Open Access Manifesto', desc: "Aaron Swartz's 2008 manifesto on information freedom. The philosophical foundation of this project.", url: 'https://ia800101.us.archive.org/1/items/GuerillaOpenAccessManifesto/Goamjuly2008.pdf' },
+            { name: 'Creative Commons', desc: 'The licensing framework that makes open access media possible. Learn what the licenses mean.', url: 'https://creativecommons.org' },
+          ]
+        }
+      ];
+
+      return (
+        <>
+          <header className="hero">
+            <p className="hero-label">Free & Legal</p>
+            <h1>Open Access<br /><em>Resources</em></h1>
+            <p className="hero-sub">A curated collection of free, legal sources for media, books, audio, and tools. Everything here is public domain or openly licensed.</p>
+          </header>
+
+          <main className="content">
+            {sections.map(s => (
+              <section className="content-section" key={s.title}>
+                <p className="section-label">{s.label}</p>
+                <h2>{s.title}</h2>
+                <div className="resource-grid">
+                  {s.cards.map(c => (
+                    <div className="resource-card" key={c.name}>
+                      <h3>{c.name}</h3>
+                      <p>{c.desc}</p>
+                      <a href={c.url} target="_blank">{c.url.replace('https://', '')} →</a>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </main>
+        </>
+      );
+    }
+
+    function App() {
+      const [page, setPage] = useState('about');
+      return (
+        <>
+          <Nav page={page} setPage={setPage} />
+          {page === 'about' && <About setPage={setPage} />}
+          {page === 'guide' && <Guide />}
+          {page === 'resources' && <Resources />}
+          <footer>
+            <p>Open Access Media Project — CPDJ 101 &nbsp;·&nbsp; Built with Jellyfin, Raspberry Pi, and the spirit of Aaron Swartz</p>
+          </footer>
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
